@@ -1,0 +1,63 @@
+import plotly.graph_objects as go
+import numpy as np
+
+# 定义立方体顶点和颜色（示例：X轴行业颜色）
+colors = {
+    "制造业": "#2E86C1",   # 深蓝
+    "服务业": "#28B463",   # 绿色
+    "农业": "#BA4A00",     # 土黄
+    "建筑业": "#FF7F50",    # 橙色
+    "信息技术": "#5DADE2",  # 浅蓝
+    "金融业": "#F1C40F"     # 金色
+}
+
+# 生成随机案例数据（示例：48个组合点）
+x = np.repeat(np.arange(6), 8)       # 6个行业
+y = np.tile(np.repeat(np.arange(4), 2), 6)  # 4种规模
+z = np.tile([0,1], 24)               # 2种税种（示例简化）
+
+# 创建散点图对象
+scatter = go.Scatter3d(
+    x=x, y=y, z=z,
+    mode='markers+text',
+    marker=dict(
+        size=8,
+        color=[colors["制造业"] if xi==0 else 
+               colors["服务业"] if xi==1 else
+               colors["农业"] if xi==2 else
+               colors["建筑业"] if xi==3 else
+               colors["信息技术"] if xi==4 else
+               colors["金融业"] for xi in x],  # 按行业着色
+        opacity=0.8
+    ),
+    text=[f"行业:{['制造业','服务业','农业','建筑业','信息技术','金融业'][xi]}<br>"
+          f"规模:{['大型','中型','小型','微型'][yi]}<br>"
+          f"税种:{['增值税','企业所得税'][zi]}" 
+          for xi, yi, zi in zip(x, y, z)],
+    hoverinfo='text'
+)
+
+# 设置坐标轴
+layout = go.Layout(
+    scene=dict(
+        xaxis=dict(
+            title='行业特征',
+            ticktext=list(colors.keys()),
+            tickvals=np.arange(6)
+        ),
+        yaxis=dict(
+            title='企业规模',
+            ticktext=['大型', '中型', '小型', '微型'],
+            tickvals=np.arange(4)
+        ),
+        zaxis=dict(
+            title='税种',
+            ticktext=['增值税', '企业所得税'],
+            tickvals=[0,1]
+        )
+    ),
+    margin=dict(l=0, r=0, b=0, t=30)
+)
+
+fig = go.Figure(data=[scatter], layout=layout)
+fig.show()
